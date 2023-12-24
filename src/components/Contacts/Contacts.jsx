@@ -5,7 +5,7 @@ const Contacts = ({ contacts, deleteContact }) => (
   <ul className={css.contactsList}>
     {contacts.map(({ id, name, number }) => (
       <ContactItem
-        key={id}
+        key={id} 
         id={id}
         name={name}
         number={number}
@@ -14,4 +14,5 @@ const Contacts = ({ contacts, deleteContact }) => (
     ))}
   </ul>
 );
+
 export default Contacts;

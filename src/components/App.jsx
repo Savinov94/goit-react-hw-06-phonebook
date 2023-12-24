@@ -1,26 +1,34 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import {
+  addContact,
+  deleteContact,
+  setFilter,
+  setContacts,
+} from '../store/contactsSlice';
+import LazyForm from './Form/Form';
+import LazyContacts from './Contacts/Contacts';
+import LazyFilter from './Filter/Filter';
 import css from './App.module.css';
 
-const LazyForm = lazy(() => import('./Form/Form'));
-const LazyContacts = lazy(() => import('./Contacts/Contacts'));
-const LazyFilter = lazy(() => import('./Filter/Filter'));
-
 const App = () => {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contacts.items);
+  const filter = useSelector(state => state.contacts.filter);
 
   useEffect(() => {
-    const storedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (storedContacts) {
-      setContacts(storedContacts);
+    const storedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
+    if (storedContacts.length > 0) {
+      dispatch(setContacts(storedContacts));
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  }, [contacts, dispatch]);
 
-  const formSubmitHandler = (data) => {
+  const formSubmitHandler = data => {
     const { name } = data;
 
     if (isContactNameExists(name)) {
@@ -28,17 +36,17 @@ const App = () => {
       return;
     }
 
-    setContacts((prevContacts) => [...prevContacts, data]);
+    dispatch(addContact(data));
   };
 
-  const isContactNameExists = (name) => {
-    return contacts.some((contact) =>
-      contact.name.toLowerCase() === name.toLowerCase()
+  const isContactNameExists = name => {
+    return contacts.some(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
     );
   };
 
-  const changeFilter = (e) => {
-    setFilter(e.currentTarget.value);
+  const changeFilter = e => {
+    dispatch(setFilter(e.currentTarget.value));
   };
 
   const getVisibleContacts = () => {
@@ -47,29 +55,28 @@ const App = () => {
     }
 
     const normalizedFilter = filter.toLowerCase();
-    return contacts.filter((contact) =>
+    return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
 
-  const deleteContact = (id) => {
-    setContacts((prevContacts) =>
-      prevContacts.filter((el) => el.id !== id)
-    );
+  const deleteContactHandler = id => {
+    dispatch(deleteContact(id));
   };
 
   const visibleContacts = getVisibleContacts();
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className={css.app}>
-        <h1>Phonebook</h1>
-        <LazyForm onSubmit={formSubmitHandler} />
-        <h2>Contacts</h2>
-        <LazyFilter value={filter} onChange={changeFilter} />
-        <LazyContacts contacts={visibleContacts} deleteContact={deleteContact} />
-      </div>
-    </Suspense>
+    <div className={css.app}>
+      <h1>Phonebook</h1>
+      <LazyForm onSubmit={formSubmitHandler} />
+      <h2>Contacts</h2>
+      <LazyFilter value={filter} onChange={changeFilter} />
+      <LazyContacts
+        contacts={visibleContacts}
+        deleteContact={deleteContactHandler}
+      />
+    </div>
   );
 };
 
