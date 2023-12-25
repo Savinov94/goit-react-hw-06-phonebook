@@ -1,18 +1,29 @@
-import css from './Contacts.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteContact } from '../../store/contactsSlice';
 import ContactItem from '../ContactItem/ContactItem';
+import css from './Contacts.module.css';
+import { selectFilteredContacts } from '../../store/contactsSlice';
 
-const Contacts = ({ contacts, deleteContact }) => (
-  <ul className={css.contactsList}>
-    {contacts.map(({ id, name, number }) => (
-      <ContactItem
-        key={id} 
-        id={id}
-        name={name}
-        number={number}
-        onDeleteContact={deleteContact}
-      />
-    ))}
-  </ul>
-);
+const Contacts = () => {
+  const dispatch = useDispatch();
+  const filteredContacts = useSelector(selectFilteredContacts);
 
+  const handleDeleteContact = id => {
+    dispatch(deleteContact(id));
+  };
+
+  return (
+    <ul className={css.contactsList}>
+      {filteredContacts.map(({ id, name, number }) => (
+        <ContactItem
+          key={id}
+          id={id}
+          name={name}
+          number={number}
+          onDeleteContact={handleDeleteContact}
+        />
+      ))}
+    </ul>
+  );
+};
 export default Contacts;

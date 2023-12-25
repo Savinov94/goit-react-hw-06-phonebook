@@ -1,3 +1,4 @@
+import React from 'react';
 import css from './Filter.module.css';
 
 const Filter = ({ value, onChange }) => {
@@ -7,7 +8,7 @@ const Filter = ({ value, onChange }) => {
         className={css.inputFilter}
         type="text"
         value={value}
-        onChange={onChange}
+        onChange={e => onChange(e.target.value)}
         placeholder="Find contacts by name"
       />
     </label>

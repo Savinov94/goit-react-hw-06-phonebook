@@ -1,3 +1,4 @@
+import React from 'react';
 import css from './ContactItem.module.css';
 
 const ContactItem = ({ id, name, number, onDeleteContact }) => (
@@ -8,7 +9,9 @@ const ContactItem = ({ id, name, number, onDeleteContact }) => (
     <button
       className={css.contactsButton}
       type="button"
-      onClick={() => onDeleteContact(id)}
+      onClick={() => {
+        onDeleteContact(id);
+      }}
     >
       🗑️
     </button>

@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../store/contactsSlice';
+import { contactsSelector } from '../../store/contactsSelectors';
 import css from './Form.module.css';
 
-const Form = ({ onSubmit }) => {
+const Form = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(contactsSelector);
+
   const [formData, setFormData] = useState({
     name: '',
     number: '',
@@ -16,9 +22,21 @@ const Form = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
     const { name, number } = formData;
-    const id = nanoid();
-    onSubmit({ id, name, number });
-    reset();
+
+    if (!name || !number) {
+      alert('Please enter name and number');
+      return;
+    }
+
+    const isContactExists = contacts.some(contact => contact.name === name);
+
+    if (!isContactExists) {
+      const id = nanoid();
+      dispatch(addContact({ id, name, number }));
+      reset();
+    } else {
+      alert(`Contact with name ${name} already exists.`);
+    }
   };
 
   const reset = () => {
@@ -50,7 +68,9 @@ const Form = ({ onSubmit }) => {
             required
           />
         </label>
-        <button className={css.formButton}>Add Contact</button>
+        <button className={css.formButton} type="submit">
+          Add Contact
+        </button>
       </form>
     </div>
   );
