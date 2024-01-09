@@ -8,7 +8,7 @@ import css from './Form.module.css';
 
 const Form = () => {
   const dispatch = useDispatch();
-   const contacts = useSelector(contactsSelector);
+  const contacts = useSelector(contactsSelector);
 
   const [formData, setFormData] = useState({
     name: '',
